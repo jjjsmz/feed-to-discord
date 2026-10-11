@@ -61,7 +61,8 @@ async function registerCommands() {
 
         await rest.put(
             Routes.applicationCommands(DISCORD_APPLICATION_ID),
-            { body: commands }
+            // DM を対象外に
+            { body: commands.map(cmd => ({ ...cmd, contexts: [0] })) }
         );
 
         console.log('Successfully reloaded application (/) commands.');

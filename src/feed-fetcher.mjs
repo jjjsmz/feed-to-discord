@@ -79,9 +79,7 @@ async function checkFeed(feedInfo, rssService, feedService) {
 
       // Include lastItemDate in the same update
       const newestItem = newItems[newItems.length - 1]; // Last item in chronological order
-      updateFields.lastItemDate = new Date(
-        newestItem.pubDate || newestItem.isoDate,
-      ).toISOString();
+      updateFields.lastItemDate = newestItem.isoDate;
     }
 
     // Single batch update for all fields
