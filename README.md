@@ -10,6 +10,8 @@ Serverless RSS Bot for Discord using AWS Services
 - AWS Secrets Manager
 - AWS CloudFormation
 
+![Architecture](docs/architecture.svg)
+
 ## Setup
 
 ### 1. Setup Discord Bot
