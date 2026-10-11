@@ -144,21 +144,21 @@ export class FeedSubscriptionService {
     do {
       const params = {
         TableName: FEEDS_TABLE,
-        ProjectionExpression: "feedUrl, lastChecked, lastItemDate",
+        ProjectionExpression: "feedUrl, lastItemDate",
         ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
       };
 
       const result = await dynamodb.send(new ScanCommand(params));
 
-      // Group by feedUrl to avoid duplicates
-      result.Items.forEach((item) => {
-        if (!uniqueFeeds[item.feedUrl]) {
-          uniqueFeeds[item.feedUrl] = {
-            lastChecked: item.lastChecked,
-            lastItemDate: item.lastItemDate,
-          };
+      // Group by feedUrl, keeping the newest cursor.
+      // 後から別チャンネルで購読した行は lastItemDate が null なので、
+      // 先に見つかった行を採用すると初回扱いになり既存チャンネルに重複投稿される。
+      for (const item of result.Items) {
+        const current = uniqueFeeds[item.feedUrl]?.lastItemDate;
+        if (!current || (item.lastItemDate && item.lastItemDate > current)) {
+          uniqueFeeds[item.feedUrl] = { lastItemDate: item.lastItemDate };
         }
-      });
+      }
 
       lastEvaluatedKey = result.LastEvaluatedKey;
     } while (lastEvaluatedKey);
