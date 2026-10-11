@@ -79,5 +79,19 @@ describe("RSSService", () => {
       expect(items).toBeInstanceOf(Array);
       expect(items.length).toBe(0);
     });
+
+    it("Skips items with unparseable dates instead of throwing", () => {
+      // rss-parser は日付をパースできない時 isoDate を付けない
+      const feed = {
+        items: [
+          { title: "bad", pubDate: "not a date" },
+          { title: "old", isoDate: "2024-01-01T00:00:00.000Z" },
+          { title: "new", isoDate: "2024-02-01T00:00:00.000Z" },
+        ],
+      };
+      const items = rssService.getNewItems(feed, "2024-01-15T00:00:00.000Z");
+
+      expect(items.map((i) => i.title)).toEqual(["new"]);
+    });
   });
 });

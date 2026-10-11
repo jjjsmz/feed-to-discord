@@ -47,13 +47,12 @@ export class RSSService {
    * @private
    */
   #sortItemsByDate(items) {
+    // isoDate は rss-parser が日付をパースできた時だけ付く。
+    // pubDate を直接 new Date すると不正な日付で toISOString が throw し、
+    // そのフィードが毎回失敗し続けるため isoDate だけを使う。
     return items
-      .filter((item) => item.pubDate || item.isoDate)
-      .sort((a, b) => {
-        const dateA = new Date(a.pubDate || a.isoDate);
-        const dateB = new Date(b.pubDate || b.isoDate);
-        return dateB - dateA;
-      });
+      .filter((item) => item.isoDate)
+      .sort((a, b) => b.isoDate.localeCompare(a.isoDate));
   }
 
   /**
@@ -98,10 +97,7 @@ export class RSSService {
     }
 
     // Return items newer than the last item date
-    const newItems = sortedItems.filter(
-      (item) =>
-        new Date(item.pubDate || item.isoDate).toISOString() > lastItemDate,
-    );
+    const newItems = sortedItems.filter((item) => item.isoDate > lastItemDate);
 
     return newItems.reverse(); // Return in chronological order
   }
