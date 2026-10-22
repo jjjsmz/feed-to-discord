@@ -23,6 +23,6 @@
     "devDependencies": {
         "@biomejs/biome": "2.3.0",
         "@types/node": "^24.0.0",
-        "vitest": "^4.0.0"
+        "vitest": "^4.1.0"
     }
 }
